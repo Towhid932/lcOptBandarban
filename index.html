@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+বান্দরবান জেলা পুলিশ - এলসি/অপারেটর ম্যানেজমেন্ট সিস্টেম
+</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>বান্দরবান জেলা পুলিশ</h1>
+
+<p>
+এলসি / অপারেটর ম্যানেজমেন্ট সিস্টেম
+</p>
+
+</header>
+
+
+<main class="container">
+
+
+<!-- HOME -->
+
+<section id="home" class="card">
+
+<h2>স্বাগতম</h2>
+
+<p>
+অনুগ্রহ করে আপনার পোর্টাল নির্বাচন করুন
+</p>
+
+<div class="portal-buttons">
+
+<button
+class="btn primary"
+onclick="openEntry()">
+ইউজার
+</button>
+
+<button
+class="btn dark"
+onclick="openAdminLogin()">
+লগইন
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ENTRY -->
+
+<section id="entry" class="hidden">
+
+<div class="card">
+
+<h2>সাধারণ নির্দেশনা</h2>
+
+<div class="notice">
+
+<p>১। Registration-এর সময় সকল তথ্য সঠিকভাবে পূরণ করতে হবে।</p>
+
+<p>২। একটি BP দিয়ে দ্বিতীয়বার Registration করা যাবে না।</p>
+
+<p>৩। BP অবশ্যই <b>BP + ১০টি সংখ্যা</b> অর্থাৎ মোট ১২ characters হতে হবে।</p>
+
+<p>৪। Password ৬ থেকে ১২ characters হতে হবে।</p>
+
+<p>৫। Password-এ English letter, number এবং symbol থাকতে হবে।</p>
+
+<p>৬। Brash Number এবং Remark optional।</p>
+
+</div>
+
+<button
+class="btn primary"
+onclick="openAuth()">
+Registration / Login
+</button>
+
+<button
+class="btn secondary"
+onclick="goHome()">
+Back
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>নিবন্ধিত সদস্যদের তালিকা</h2>
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>SL</th>
+<th>Unit</th>
+<th>Rank</th>
+<th>Name</th>
+<th>Position</th>
+<th>Mobile</th>
+<th>Remark</th>
+
+</tr>
+
+</thead>
+
+<tbody id="publicTable">
+
+<tr>
+<td colspan="7">
+Loading...
+</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- USER DASHBOARD -->
+
+<section
+id="userDashboard"
+class="hidden">
+
+<div class="card">
+
+<h2>User Dashboard</h2>
+
+<div id="userInfo"></div>
+
+<button
+class="btn secondary"
+onclick="userLogout()">
+Logout
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN DASHBOARD -->
+
+<section
+id="adminDashboard"
+class="hidden">
+
+<div class="card">
+
+<h2>Admin Dashboard</h2>
+
+<div class="admin-buttons">
+
+<button
+class="btn primary"
+onclick="loadAdminUsers()">
+Registration Data
+</button>
+
+<button
+class="btn warning"
+onclick="loadRecycle()">
+Recycle Data
+</button>
+
+<button
+class="btn secondary"
+onclick="adminLogout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+
+<div
+id="adminDataCard"
+class="card">
+
+<h3>Registration Data</h3>
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>SL</th>
+<th>BP</th>
+<th>Rank</th>
+<th>Brash Number</th>
+<th>Name</th>
+<th>Unit</th>
+<th>Mobile</th>
+<th>Position</th>
+<th>Remark</th>
+<th>Registration Date Time</th>
+<th>IP Address</th>
+<th>Status</th>
+<th>Delete</th>
+
+</tr>
+
+</thead>
+
+<tbody id="adminTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<div
+id="recycleCard"
+class="card hidden">
+
+<h3>Recycle Data</h3>
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>SL</th>
+<th>BP</th>
+<th>Rank</th>
+<th>Name</th>
+<th>Unit</th>
+<th>Position</th>
+<th>Deleted Date Time</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recycleTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+
+<!-- AUTH MODAL -->
+
+<div
+id="authModal"
+class="modal hidden">
+
+<div class="modal-box">
+
+<div class="modal-title">
+
+<h2 id="authTitle">
+Registration Form
+</h2>
+
+<button
+class="close"
+onclick="closeAuth()">
+×
+</button>
+
+</div>
+
+
+<!-- REGISTER -->
+
+<div id="registerBox">
+
+<form id="registerForm">
+
+<div class="form-grid">
+
+
+<div>
+
+<label>BP *</label>
+
+<input
+id="bp"
+type="text"
+maxlength="12"
+placeholder="BP1234567890"
+required>
+
+<small>
+BP + ১০টি সংখ্যা
+</small>
+
+</div>
+
+
+<div>
+
+<label>Rank *</label>
+
+<select id="rank" required>
+
+<option value="">
+Select Rank
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Brash Number</label>
+
+<input
+id="brashNumber"
+type="text">
+
+</div>
+
+
+<div>
+
+<label>Name *</label>
+
+<input
+id="name"
+required>
+
+</div>
+
+
+<div>
+
+<label>Unit *</label>
+
+<select id="unit" required>
+
+<option value="">
+Select Unit
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Mobile *</label>
+
+<input
+id="mobile"
+type="tel"
+required>
+
+</div>
+
+
+<div>
+
+<label>Position *</label>
+
+<select
+id="position"
+required>
+
+<option value="">
+Select Position
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>Password *</label>
+
+<div class="password-field">
+
+<input
+id="password"
+type="password"
+maxlength="12"
+minlength="6"
+required>
+
+<button
+type="button"
+onclick="togglePassword('password')">
+👁
+</button>
+
+</div>
+
+</div>
+
+
+<div class="full">
+
+<label>Remark</label>
+
+<textarea
+id="remark">
+</textarea>
+
+</div>
+
+
+</div>
+
+<br>
+
+<button
+class="btn primary"
+type="submit">
+Registration
+</button>
+
+</form>
+
+
+<hr>
+
+<p>
+আগে Registration করা থাকলে
+</p>
+
+<button
+class="btn dark"
+onclick="showLogin()">
+User Login
+</button>
+
+</div>
+
+
+<!-- LOGIN -->
+
+<div
+id="loginBox"
+class="hidden">
+
+<form id="loginForm">
+
+<label>BP</label>
+
+<input
+id="loginBP"
+maxlength="12"
+required>
+
+<br><br>
+
+<label>Password</label>
+
+<div class="password-field">
+
+<input
+id="loginPassword"
+type="password"
+required>
+
+<button
+type="button"
+onclick="togglePassword('loginPassword')">
+👁
+</button>
+
+</div>
+
+<br>
+
+<button
+class="btn primary"
+type="submit">
+Login
+</button>
+
+</form>
+
+
+<br>
+
+<button
+class="btn secondary"
+onclick="showRegister()">
+Registration
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ADMIN LOGIN -->
+
+<div
+id="adminModal"
+class="modal hidden">
+
+<div class="modal-box">
+
+<div class="modal-title">
+
+<h2>Admin Login</h2>
+
+<button
+class="close"
+onclick="closeAdminLogin()">
+×
+</button>
+
+</div>
+
+<form id="adminForm">
+
+<label>Admin ID</label>
+
+<input
+id="adminID"
+required>
+
+<br><br>
+
+<label>Password</label>
+
+<input
+id="adminPassword"
+type="password"
+required>
+
+<br><br>
+
+<button
+class="btn primary"
+type="submit">
+Login
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
