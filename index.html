@@ -1,594 +1,738 @@
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>
-বান্দরবান জেলা পুলিশ - এলসি/অপারেটর ম্যানেজমেন্ট সিস্টেম
-</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বান্দরবান জেলা পুলিশ – এলসি/অপারেটর ম্যানেজমেন্ট সিস্টেম</title>
+    <style>
+        :root { --primary: #004d40; --secondary: #00796b; --light: #f4f6f9; --accent: #ff9800; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'SolaimanLipi', Arial, sans-serif; }
+        body { background-color: var(--light); color: #333; line-height: 1.6; }
+        header { background: var(--primary); color: #fff; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .container { max-width: 1200px; margin: 20px auto; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .hidden { display: none !important; }
+        .btn { background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; transition: 0.3s; }
+        .btn:hover { background: var(--primary); }
+        .btn-danger { background: #d32f2f; }
+        .btn-danger:hover { background: #b71c1c; }
+        .btn-success { background: #2e7d32; }
+        .btn-success:hover { background: #1b5e20; }
+        .btn:disabled, .btn-danger:disabled { background: #ccc !important; cursor: not-allowed; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: var(--primary); color: white; }
+        .notice-board { background: #e0f2f1; border-left: 5px solid var(--secondary); padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; cursor: pointer; background: #eee; margin-right: 5px; margin-bottom: 5px; border-radius: 4px 4px 0 0; }
+        .tab.active { background: var(--primary); color: white; }
+        .password-container { position: relative; }
+        .toggle-password { position: absolute; right: 10px; top: 15px; cursor: pointer; }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
 </head>
-
 <body>
 
 <header>
-
-<h1>বান্দরবান জেলা পুলিশ</h1>
-
-<p>
-এলসি / অপারেটর ম্যানেজমেন্ট সিস্টেম
-</p>
-
+    <h2>বান্দরবান জেলা পুলিশ</h2>
+    <p>এলসি / অপারেটর ম্যানেজমেন্ট সিস্টেম</p>
 </header>
 
+<!-- Welcome Section -->
+<div class="container" id="welcome-section">
+    <div style="text-align: center; padding: 10px;">
+        <h3>স্বাগতম এবং অনুগ্রহ করে আপনার পোর্টাল নির্বাচন করুন</h3>
+        <br>
+        <button class="btn" onclick="showSection('auth-section')">ইউজার এবং লগইন</button>
+    </div>
 
-<main class="container">
+    <div class="notice-board">
+        <h4>📢 সাধারণ নির্দেশনা বোর্ড</h4>
+        <ul>
+            <li>সঠিক BP নম্বর (১২ ডিজিট এবং শুরুতে 'BP') দিয়ে রেজিস্ট্রেশন করুন।</li>
+            <li>মোবাইল নম্বর অবশ্যই ১১ ডিজিটের হতে হবে।</li>
+            <li>সব তথ্য নির্ভুলভাবে পূরণ করুন।</li>
+        </ul>
+    </div>
 
-
-<!-- HOME -->
-
-<section id="home" class="card">
-
-<h2>স্বাগতম</h2>
-
-<p>
-অনুগ্রহ করে আপনার পোর্টাল নির্বাচন করুন
-</p>
-
-<div class="portal-buttons">
-
-<button
-class="btn primary"
-onclick="openEntry()">
-ইউজার
-</button>
-
-<button
-class="btn dark"
-onclick="openAdminLogin()">
-লগইন
-</button>
-
+    <div>
+        <h4>সকল ইউনিটে Rank ভিত্তিক এন্ট্রিকৃত তথ্যের পরিসংখ্যান</h4>
+        <div style="overflow-x: auto;" id="printable-area">
+            <div class="no-print" style="margin: 10px 0;">
+                <button class="btn btn-success" onclick="window.print()">🖨️ প্রিন্ট করুন</button>
+                <button class="btn" onclick="exportTableToExcel('public-stats-table', 'Bandarban_Police_Stats.xls')">📥 এক্সেল ডাউনলোড</button>
+            </div>
+            <table id="public-stats-table">
+                <thead>
+                    <tr><th>SL</th><th>Unit</th><th>কনস্টেবল</th><th>নায়েক</th><th>এএসআই (নিরস্ত্র)</th><th>এএসআই (সশস্ত্র)</th><th>এটিএসআই</th><th>এসআই (নিরস্ত্র)</th><th>এসআই (সশস্ত্র)</th><th>টিএসআই</th><th>অন্যান্য/মোট</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-</section>
-
-
-<!-- ENTRY -->
-
-<section id="entry" class="hidden">
-
-<div class="card">
-
-<h2>সাধারণ নির্দেশনা</h2>
-
-<div class="notice">
-
-<p>১। Registration-এর সময় সকল তথ্য সঠিকভাবে পূরণ করতে হবে।</p>
-
-<p>২। একটি BP দিয়ে দ্বিতীয়বার Registration করা যাবে না।</p>
-
-<p>৩। BP অবশ্যই <b>BP + ১০টি সংখ্যা</b> অর্থাৎ মোট ১২ characters হতে হবে।</p>
-
-<p>৪। Password ৬ থেকে ১২ characters হতে হবে।</p>
-
-<p>৫। Password-এ English letter, number এবং symbol থাকতে হবে।</p>
-
-<p>৬। Brash Number এবং Remark optional।</p>
-
+<!-- Auth Section -->
+<div class="container hidden" id="auth-section">
+    <button class="btn" onclick="showSection('welcome-section')">← হোম পেজ</button>
+    <div style="display: flex; justify-content: space-around; margin-top: 20px; flex-wrap: wrap;">
+        <div style="width: 100%; max-width: 450px;">
+            <h3>লগইন ফরম</h3>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <input type="text" id="login-bp" placeholder="BP Number (12 Digit)" required>
+                <div class="password-container">
+                    <input type="password" id="login-pass" placeholder="Password" required>
+                    <span class="toggle-password" onclick="togglePass('login-pass')">👁️</span>
+                </div>
+                <button type="submit" class="btn">লগইন</button>
+            </form>
+        </div>
+        <div style="width: 100%; max-width: 450px; margin-top: 20px;">
+            <h3>রেজিস্ট্রেশন ফরম</h3>
+            <button class="btn" onclick="showSection('reg-form-section')">নতুন রেজিস্ট্রেশন করুন</button>
+        </div>
+    </div>
 </div>
 
-<button
-class="btn primary"
-onclick="openAuth()">
-Registration / Login
-</button>
-
-<button
-class="btn secondary"
-onclick="goHome()">
-Back
-</button>
-
+<!-- Registration Form Section -->
+<div class="container hidden" id="reg-form-section">
+    <button class="btn" onclick="showSection('auth-section')">← ফিরে যান</button>
+    <h3>রেজিস্ট্রেশন ফরম</h3>
+    <form id="reg-form" onsubmit="handleRegister(event)">
+        <input type="text" id="reg-bp" placeholder="BP Number (যেমন: BP1234567890)" required>
+        <select id="reg-rank" required>
+            <option value="">র্যাংক নির্বাচন করুন</option>
+            <option>কনস্টেবল</option><option>নায়েক</option><option>এএসআই (নিরস্ত্র)</option><option>এএসআই (সশস্ত্র)</option><option>এটিএসআই</option><option>এসআই (নিরস্ত্র)</option><option>এসআই (সশস্ত্র)</option><option>টিএসআই</option>
+        </select>
+        <input type="text" id="reg-brash" placeholder="Brash Number (ঐচ্ছিক)">
+        <input type="text" id="reg-name" placeholder="নাম" required>
+        <select id="reg-unit" required>
+            <option value="">ইউনিট নির্বাচন করুন</option>
+            <option>সদর থানা</option><option>রুমা থানা</option><option>রোয়াংছড়ি থানা</option><option>নাইক্ষংছড়ি থানা</option><option>আলীকদম থানা</option><option>থানচি থানা</option><option>লামা থানা</option><option>ঘুমধুম তদন্ত কেন্দ্র</option><option>বাইশারী তদন্ত কেন্দ্র</option><option>টংকাবতি তদন্ত কেন্দ্র</option><option>সদর ফাঁড়ি</option><option>বাইশারী ফাঁড়ি</option><option>কেয়াজুপাড়া ফাঁড়ি</option><option>গজালিয়া ফাঁড়ি</option><option>সোনাইছড়ি ফাঁড়ি</option><option>ফাইতং ফাঁড়ি</option><option>রাজবিল্লা ফাঁড়ি</option><option>ডিবি</option><option>ডিএসবি</option><option>সদর কোর্ট</option><option>লামা কোর্ট</option><option>সদর ট্রাফিক</option><option>লামা ট্রাফিক</option><option>আলীকদম ট্রাফিক</option><option>নাইক্ষ্যংছড়ি ট্রাফিক</option><option>পুলিশ সুপারের কার্যালয়</option><option>পুলিশ লাইন</option><option>এমটি</option><option>পুলিশ কন্ট্রোল রুম</option><option>ডিপার্টমেন্টাল স্টোর</option><option>অস্ত্রাগার</option><option>রেশন স্টোর</option><option>ব্যান্ড গ্রুপ</option><option>রিজার্ভ অফিস</option><option>সদর সার্কেল অফিস</option><option>লামা সার্কেল অফিস</option><option>রুমা সার্কেল অফিস</option><option>আরআই অফিস</option><option>মেজর অফিস</option><option>চিম্বুক ক্যাম্প</option><option>মেঘলা ক্যাম্প</option><option>মিলনছড়ি ক্যাম্প</option><option>হানসামপাড়া ক্যাম্প</option><option>বেতছড়া ক্যাম্প</option><option>তারাছামূখ ক্যাম্প</option><option>তালুকদারপাড়া ক্যাম্প</option><option>মুরংবাজার ক্যাম্প</option><option>কৈক্ষ্যংঝিরি ক্যাম্প</option><option>কুমারী ক্যাম্প</option><option>আজিজনগর ক্যাম্প</option><option>আলীক্ষ্যং ক্যাম্প</option><option>২৬-কিলো ক্যাম্প</option><option>রেইচা চেকপোষ্ট</option><option>ডুলুপাড়া চেকপোষ্ট</option><option>ইয়াংছা চেকপোষ্ট</option><option>রুমা এসবি গার্ড</option><option>রোয়াংছড়ি এসবি গার্ড</option><option>বেতার বেইজ</option>
+        </select>
+        <input type="text" id="reg-mobile" placeholder="মোবাইল নম্বর (১১ ডিজিট)" required>
+        <select id="reg-position" required>
+            <option value="">পজিশন নির্বাচন করুন</option>
+            <option>রিগুলার</option><option>ড্রাইভার</option><option>এলসি</option><option>কম্পিউটার অপারেটর</option><option>ওয়ার্লেস অপারেটর</option><option>ওসি</option><option>তদন্ত</option><option>আরও-১</option><option>আরও-২</option><option>আরওআই</option><option>আরআই</option><option>আইসি</option><option>বিগুলার</option><option>খেলোয়াড়</option>
+        </select>
+        <div class="password-container">
+            <input type="text" id="reg-pass" placeholder="পাসওয়ার্ড (৬-১২ ডিজিট)" required>
+        </div>
+        <button type="submit" class="btn">রেজিস্ট্রেশন সম্পন্ন করুন</button>
+    </form>
 </div>
 
+<!-- Dashboard Section -->
+<div class="container hidden" id="dashboard-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div id="user-info-box" style="background: #e0f2f1; padding: 10px; border-radius: 4px; flex-grow: 1;"></div>
+        <button class="btn btn-danger" onclick="logout()">লগআউট</button>
+    </div>
 
-<div class="card">
+    <div class="tabs" style="margin-top: 20px;">
+        <div class="tab active" id="tab-btn-entry" onclick="switchTab('entry-tab')">ডাটা এন্ট্রি</div>
+        <div class="tab" id="tab-btn-data" onclick="switchTab('data-tab')">সাবমিট ডাটা</div>
+        <div class="tab hidden" id="users-tab-btn" onclick="switchTab('users-tab')">রেজিস্টার্ড ইউজারগণ</div>
+        <div class="tab hidden" id="stats-tab-btn" onclick="switchTab('stats-tab')">পরিসংখ্যান</div>
+        <div class="tab hidden" id="logs-tab-btn" onclick="switchTab('logs-tab')">লগস (Logs)</div>
+        <div class="tab hidden" id="recycle-tab-btn" onclick="switchTab('recycle-tab')">রিসাইকেল বিন</div>
+    </div>
 
-<h2>নিবন্ধিত সদস্যদের তালিকা</h2>
+    <!-- Entry Tab -->
+    <div id="entry-tab" class="tab-content">
+        <h3>ডাটা এন্ট্রি ফরম</h3>
+        <form id="entry-form" onsubmit="handleDataSubmit(event)">
+            <input type="text" id="entry-bp" placeholder="BP Number (যেমন: BP1234567890)" required>
+            <select id="entry-rank" required>
+                <option value="">র্যাংক নির্বাচন করুন</option>
+                <option>কনস্টেবল</option><option>নায়েক</option><option>এএসআই (নিরস্ত্র)</option><option>এএসআই (সশস্ত্র)</option><option>এটিএসআই</option><option>এসআই (নিরস্ত্র)</option><option>এসআই (সশস্ত্র)</option><option>টিএসআই</option>
+            </select>
+            <input type="text" id="entry-brash" placeholder="Brash Number (ঐচ্ছিক)">
+            <input type="text" id="entry-name" placeholder="নাম" required>
+            <input type="text" id="entry-unit" placeholder="Unit (অটোমেটিক)" readonly required>
+            <input type="text" id="entry-mobile" placeholder="মোবাইল নম্বর (১১ ডিজিট)" required>
+            <select id="entry-position" required>
+                <option value="">পজিশন নির্বাচন করুন</option>
+                <option>রিগুলার</option><option>ড্রাইভার</option><option>এলসি</option><option>কম্পিউটার অপারেটর</option><option>ওয়ার্লেস অপারেটর</option><option>ওসি</option><option>তদন্ত</option><option>আরও-১</option><option>আরও-২</option><option>আরওআই</option><option>আরআই</option><option>আইসি</option><option>বিগুলার</option><option>খেলোয়াড়</option>
+            </select>
+            <textarea id="entry-remark" placeholder="Remark (ঐচ্ছিক)"></textarea>
+            <button type="submit" class="btn">সাবমিট করুন</button>
+        </form>
+    </div>
 
-<div class="table-scroll">
+    <!-- Data Tab -->
+    <div id="data-tab" class="tab-content hidden">
+        <h3>সাবমিটকৃত ডাটা (মোট: <span id="data-count">0</span>)</h3>
+        <div style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+            <select id="filter-rank" onchange="filterDashboardData()" style="max-width: 200px;">
+                <option value="">সব র্যাংক</option>
+                <option>কনস্টেবল</option><option>নায়েক</option><option>এএসআই (নিরস্ত্র)</option><option>এএসআই (সশস্ত্র)</option><option>এটিএসআই</option><option>এসআই (নিরস্ত্র)</option><option>এসআই (সশস্ত্র)</option><option>টিএসআই</option>
+            </select>
+            <select id="filter-unit" onchange="filterDashboardData()" style="max-width: 200px;" class="hidden">
+                <option value="">সব ইউনিট</option>
+            </select>
+            <button class="btn btn-success" onclick="window.print()">🖨️ প্রিন্ট</button>
+            <button class="btn" onclick="exportTableToExcel('dashboard-table', 'Submissions.xls')">📥 এক্সেল</button>
+        </div>
+        <div style="overflow-x: auto;" id="printable-dashboard">
+            <table id="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>SL</th><th>BP</th><th>Rank</th><th>Brash</th><th>Name</th><th>Unit</th><th>Mobile</th><th>Position</th><th>Remark</th><th>Submitted ID</th><th>Date & Time</th><th id="admin-th-edit" class="hidden">Edit</th><th id="admin-th-delete" class="hidden">Delete</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-<table>
+    <!-- Registered Users Tab -->
+    <div id="users-tab" class="tab-content hidden">
+        <h3>রেজিস্টার্ড ইউজারদের তালিকা (মোট: <span id="user-count">0</span>)</h3>
+        <div style="overflow-x: auto;">
+            <table id="users-table">
+                <thead>
+                    <tr><th>SL</th><th>BP</th><th>Rank</th><th>Brash</th><th>Name</th><th>Unit</th><th>Mobile</th><th>Position</th><th>Type</th><th>Reg Date</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-<thead>
+    <!-- Stats Tab -->
+    <div id="stats-tab" class="tab-content hidden">
+        <h3>ইউনিট ও র্যাংক ভিত্তিক পরিসংখ্যান</h3>
+        <div style="overflow-x: auto;">
+            <table id="admin-stats-table">
+                <thead>
+                    <tr><th>SL</th><th>Unit</th><th>কনস্টেবল</th><th>নায়েক</th><th>এএসআই (নিরস্ত্র)</th><th>এএসআই (সশস্ত্র)</th><th>এটিএসআই</th><th>এসআই (নিরস্ত্র)</th><th>এসআই (সশস্ত্র)</th><th>টিএসআই</th><th>মোট</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-<tr>
+    <!-- Logs Tab -->
+    <div id="logs-tab" class="tab-content hidden">
+        <h3>সিস্টেম লগস (Logs)</h3>
+        <div style="overflow-x: auto;">
+            <table id="logs-table">
+                <thead>
+                    <tr><th>SL</th><th>BP</th><th>Name</th><th>Role</th><th>Action</th><th>IP</th><th>Browser</th><th>Device Type</th><th>Timezone</th><th>Date & Time</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-<th>SL</th>
-<th>Unit</th>
-<th>Rank</th>
-<th>Name</th>
-<th>Position</th>
-<th>Mobile</th>
-<th>Remark</th>
-
-</tr>
-
-</thead>
-
-<tbody id="publicTable">
-
-<tr>
-<td colspan="7">
-Loading...
-</td>
-</tr>
-
-</tbody>
-
-</table>
-
+    <!-- Recycle Tab -->
+    <div id="recycle-tab" class="tab-content hidden">
+        <h3>রিসাইকেল ডাটা</h3>
+        <div style="overflow-x: auto;">
+            <table id="recycle-table">
+                <thead>
+                    <tr><th>SL</th><th>BP</th><th>Rank</th><th>Name</th><th>Unit</th><th>Submitted ID</th><th>Deleted Date</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
+<!-- Edit Modal -->
+<div id="edit-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px; border-radius:8px; width:100%; max-width:400px;">
+        <h3>ডাটা এডিট করুন</h3>
+        <form id="edit-form" onsubmit="submitEditData(event)">
+            <input type="hidden" id="edit-bp-val">
+            <label>BP (অপরিবর্তনীয়):</label>
+            <input type="text" id="edit-bp-display" disabled>
+            <label>র্যাংক:</label>
+            <select id="edit-rank" required>
+                <option>কনস্টেবল</option><option>নায়েক</option><option>এএসআই (নিরস্ত্র)</option><option>এএসআই (সশস্ত্র)</option><option>এটিএসআই</option><option>এসআই (নিরস্ত্র)</option><option>এসআই (সশস্ত্র)</option><option>টিএসআই</option>
+            </select>
+            <label>Brash:</label>
+            <input type="text" id="edit-brash">
+            <label>নাম:</label>
+            <input type="text" id="edit-name" required>
+            <label>মোবাইল (১১ ডিজিট):</label>
+            <input type="text" id="edit-mobile" required>
+            <label>পজিশন:</label>
+            <select id="edit-position" required>
+                <option>রিগুলার</option><option>ড্রাইভার</option><option>এলসি</option><option>কম্পিউটার অপারেটর</option><option>ওয়ার্লেস অপারেটর</option><option>ওসি</option><option>তদন্ত</option><option>আরও-১</option><option>আরও-২</option><option>আরওআই</option><option>আরআই</option><option>আইসি</option><option>বিগুলার</option><option>খেলোয়াড়</option>
+            </select>
+            <label>Remark:</label>
+            <textarea id="edit-remark"></textarea>
+            <button type="submit" class="btn">আপডেট করুন</button>
+            <button type="button" class="btn btn-danger" onclick="closeEditModal()">বাতিল</button>
+        </form>
+    </div>
 </div>
 
-</section>
-
-
-<!-- USER DASHBOARD -->
-
-<section
-id="userDashboard"
-class="hidden">
-
-<div class="card">
-
-<h2>User Dashboard</h2>
-
-<div id="userInfo"></div>
-
-<button
-class="btn secondary"
-onclick="userLogout()">
-Logout
-</button>
-
+<!-- Loader Modal -->
+<div id="loader-modal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:9999; display:flex; justify-content:center; align-items:center;">
+    <div class="loader"></div>
 </div>
 
-</section>
-
-
-<!-- ADMIN DASHBOARD -->
-
-<section
-id="adminDashboard"
-class="hidden">
-
-<div class="card">
-
-<h2>Admin Dashboard</h2>
-
-<div class="admin-buttons">
-
-<button
-class="btn primary"
-onclick="loadAdminUsers()">
-Registration Data
-</button>
-
-<button
-class="btn warning"
-onclick="loadRecycle()">
-Recycle Data
-</button>
-
-<button
-class="btn secondary"
-onclick="adminLogout()">
-Logout
-</button>
-
-</div>
-
-</div>
-
-
-<div
-id="adminDataCard"
-class="card">
-
-<h3>Registration Data</h3>
-
-<div class="table-scroll">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>SL</th>
-<th>BP</th>
-<th>Rank</th>
-<th>Brash Number</th>
-<th>Name</th>
-<th>Unit</th>
-<th>Mobile</th>
-<th>Position</th>
-<th>Remark</th>
-<th>Registration Date Time</th>
-<th>IP Address</th>
-<th>Status</th>
-<th>Delete</th>
-
-</tr>
-
-</thead>
-
-<tbody id="adminTable"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-
-<div
-id="recycleCard"
-class="card hidden">
-
-<h3>Recycle Data</h3>
-
-<div class="table-scroll">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>SL</th>
-<th>BP</th>
-<th>Rank</th>
-<th>Name</th>
-<th>Unit</th>
-<th>Position</th>
-<th>Deleted Date Time</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="recycleTable"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-
-<!-- AUTH MODAL -->
-
-<div
-id="authModal"
-class="modal hidden">
-
-<div class="modal-box">
-
-<div class="modal-title">
-
-<h2 id="authTitle">
-Registration Form
-</h2>
-
-<button
-class="close"
-onclick="closeAuth()">
-×
-</button>
-
-</div>
-
-
-<!-- REGISTER -->
-
-<div id="registerBox">
-
-<form id="registerForm">
-
-<div class="form-grid">
-
-
-<div>
-
-<label>BP *</label>
-
-<input
-id="bp"
-type="text"
-maxlength="12"
-placeholder="BP1234567890"
-required>
-
-<small>
-BP + ১০টি সংখ্যা
-</small>
-
-</div>
-
-
-<div>
-
-<label>Rank *</label>
-
-<select id="rank" required>
-
-<option value="">
-Select Rank
-</option>
-
-</select>
-
-</div>
-
-
-<div>
-
-<label>Brash Number</label>
-
-<input
-id="brashNumber"
-type="text">
-
-</div>
-
-
-<div>
-
-<label>Name *</label>
-
-<input
-id="name"
-required>
-
-</div>
-
-
-<div>
-
-<label>Unit *</label>
-
-<select id="unit" required>
-
-<option value="">
-Select Unit
-</option>
-
-</select>
-
-</div>
-
-
-<div>
-
-<label>Mobile *</label>
-
-<input
-id="mobile"
-type="tel"
-required>
-
-</div>
-
-
-<div>
-
-<label>Position *</label>
-
-<select
-id="position"
-required>
-
-<option value="">
-Select Position
-</option>
-
-</select>
-
-</div>
-
-
-<div>
-
-<label>Password *</label>
-
-<div class="password-field">
-
-<input
-id="password"
-type="password"
-maxlength="12"
-minlength="6"
-required>
-
-<button
-type="button"
-onclick="togglePassword('password')">
-👁
-</button>
-
-</div>
-
-</div>
-
-
-<div class="full">
-
-<label>Remark</label>
-
-<textarea
-id="remark">
-</textarea>
-
-</div>
-
-
-</div>
-
-<br>
-
-<button
-class="btn primary"
-type="submit">
-Registration
-</button>
-
-</form>
-
-
-<hr>
-
-<p>
-আগে Registration করা থাকলে
-</p>
-
-<button
-class="btn dark"
-onclick="showLogin()">
-User Login
-</button>
-
-</div>
-
-
-<!-- LOGIN -->
-
-<div
-id="loginBox"
-class="hidden">
-
-<form id="loginForm">
-
-<label>BP</label>
-
-<input
-id="loginBP"
-maxlength="12"
-required>
-
-<br><br>
-
-<label>Password</label>
-
-<div class="password-field">
-
-<input
-id="loginPassword"
-type="password"
-required>
-
-<button
-type="button"
-onclick="togglePassword('loginPassword')">
-👁
-</button>
-
-</div>
-
-<br>
-
-<button
-class="btn primary"
-type="submit">
-Login
-</button>
-
-</form>
-
-
-<br>
-
-<button
-class="btn secondary"
-onclick="showRegister()">
-Registration
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ADMIN LOGIN -->
-
-<div
-id="adminModal"
-class="modal hidden">
-
-<div class="modal-box">
-
-<div class="modal-title">
-
-<h2>Admin Login</h2>
-
-<button
-class="close"
-onclick="closeAdminLogin()">
-×
-</button>
-
-</div>
-
-<form id="adminForm">
-
-<label>Admin ID</label>
-
-<input
-id="adminID"
-required>
-
-<br><br>
-
-<label>Password</label>
-
-<input
-id="adminPassword"
-type="password"
-required>
-
-<br><br>
-
-<button
-class="btn primary"
-type="submit">
-Login
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-
-<script src="script.js"></script>
-
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJITdgP152e5db0htBjFzL9YjJ6btNDwUpVclTCpovEHSrIzG9hYLJ0FkuRYvCiAvM/exec";
+    let currentUser = null;
+    let allSubmissions = [];
+    let allUsers = [];
+    let allLogs = [];
+
+    window.onload = function() { loadPublicStats(); };
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+        document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    function showLoader() { document.getElementById('loader-modal').classList.remove('hidden'); }
+    function hideLoader() { document.getElementById('loader-modal').classList.add('hidden'); }
+
+    function togglePass(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function getDeviceInfo() {
+        let ua = navigator.userAgent;
+        let browser = "Unknown";
+        if(ua.indexOf("Firefox") > -1) browser = "Mozilla Firefox";
+        else if(ua.indexOf("SamsungBrowser") > -1) browser = "Samsung Internet";
+        else if(ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) browser = "Opera";
+        else if(ua.indexOf("Trident") > -1) browser = "MS Internet Explorer";
+        else if(ua.indexOf("Edge") > -1) browser = "Microsoft Edge";
+        else if(ua.indexOf("Chrome") > -1) browser = "Google Chrome";
+        else if(ua.indexOf("Safari") > -1) browser = "Apple Safari";
+
+        let deviceType = /Mobi|Android/i.test(ua) ? "Mobile" : "Desktop";
+        let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return { browser, deviceType, timezone };
+    }
+
+    // Validation functions
+    function validateBP(bp) {
+        return bp.startsWith("BP") && bp.length === 12 && !/\s/.test(bp);
+    }
+
+    function validateMobile(mobile) {
+        let mobileRegex = /^\d{11}$/;
+        return mobileRegex.test(mobile);
+    }
+
+    async function loadPublicStats() {
+        try {
+            let res = await fetch(SCRIPT_URL + "?action=getPublicStats");
+            let data = await res.json();
+            if (data.status === "success") {
+                let tbody = document.querySelector("#public-stats-table tbody");
+                tbody.innerHTML = "";
+                let ranks = ["কনস্টেবল", "নায়েক", "এএসআই (নিরস্ত্র)", "এএসআই (সশস্ত্র)", "এটিএসআই", "এসআই (নিরস্ত্র)", "এসআই (সশস্ত্র)", "টিএসআই"];
+                let sl = 1;
+                for (let unit in data.stats) {
+                    let tr = `<tr><td>${sl++}</td><td>${unit}</td>`;
+                    let totalUnit = 0;
+                    ranks.forEach(r => {
+                        let count = data.stats[unit][r] || 0;
+                        totalUnit += count;
+                        tr += `<td>${count}</td>`;
+                    });
+                    tr += `<td><b>${totalUnit}</b></td></tr>`;
+                    tbody.innerHTML += tr;
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function handleRegister(e) {
+        e.preventDefault();
+        let bp = document.getElementById('reg-bp').value.trim();
+        let mobile = document.getElementById('reg-mobile').value.trim();
+
+        if (!validateBP(bp)) {
+            alert("BP নম্বর অবশ্যই ১২ ডিজিটের হতে হবে এবং শুরুতে 'BP' থাকতে হবে (যেমন: BP1234567890)।");
+            return;
+        }
+
+        if (!validateMobile(mobile)) {
+            alert("মোবাইল নম্বর অবশ্যই ১১ ডিজিটের হতে হবে।");
+            return;
+        }
+
+        let payload = {
+            action: "register",
+            bp: bp,
+            rank: document.getElementById('reg-rank').value,
+            brashNumber: document.getElementById('reg-brash').value,
+            name: document.getElementById('reg-name').value,
+            unit: document.getElementById('reg-unit').value,
+            mobile: mobile,
+            position: document.getElementById('reg-position').value,
+            password: document.getElementById('reg-pass').value
+        };
+
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        let result = await res.json();
+        hideLoader();
+        alert(result.message);
+        if (result.status === "success") showSection('auth-section');
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        let info = getDeviceInfo();
+        let payload = {
+            action: "login",
+            bp: document.getElementById('login-bp').value.trim(),
+            password: document.getElementById('login-pass').value,
+            ip: "Web-Client",
+            browser: info.browser,
+            device: info.deviceType,
+            timezone: info.timezone
+        };
+
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        let result = await res.json();
+        hideLoader();
+
+        if (result.status === "success") {
+            currentUser = result;
+            setupDashboard();
+            showSection('dashboard-section');
+        } else {
+            alert(result.message);
+        }
+    }
+
+    async function setupDashboard() {
+        let infoBox = document.getElementById('user-info-box');
+        infoBox.innerHTML = `<b>নাম:</b> ${currentUser.name} | <b>BP:</b> ${currentUser.bp} | <b>Unit:</b> ${currentUser.unit} | <b>Role:</b> ${currentUser.role}`;
+        
+        let entryTabBtn = document.getElementById('tab-btn-entry');
+        let entryTab = document.getElementById('entry-tab');
+
+        document.getElementById('users-tab-btn').classList.add('hidden');
+        document.getElementById('stats-tab-btn').classList.add('hidden');
+        document.getElementById('logs-tab-btn').classList.add('hidden');
+        document.getElementById('recycle-tab-btn').classList.add('hidden');
+        document.getElementById('admin-th-edit').classList.add('hidden');
+        document.getElementById('admin-th-delete').classList.add('hidden');
+        document.getElementById('filter-unit').classList.add('hidden');
+
+        if (currentUser.role === 'superAdmin') {
+            entryTabBtn.classList.add('hidden');
+            entryTab.classList.add('hidden');
+            document.getElementById('tab-btn-data').click();
+
+            document.getElementById('users-tab-btn').classList.remove('hidden');
+            document.getElementById('stats-tab-btn').classList.remove('hidden');
+            document.getElementById('logs-tab-btn').classList.remove('hidden');
+            document.getElementById('recycle-tab-btn').classList.remove('hidden');
+            document.getElementById('admin-th-edit').classList.remove('hidden');
+            document.getElementById('admin-th-delete').classList.remove('hidden');
+            document.getElementById('filter-unit').classList.remove('hidden');
+            
+            await fetchUsersList();
+            await fetchLogsList();
+        } else if (currentUser.role === 'admin') {
+            entryTabBtn.classList.add('hidden');
+            entryTab.classList.add('hidden');
+            document.getElementById('tab-btn-data').click();
+
+            document.getElementById('users-tab-btn').classList.remove('hidden');
+            document.getElementById('stats-tab-btn').classList.remove('hidden');
+            document.getElementById('recycle-tab-btn').classList.remove('hidden');
+            document.getElementById('admin-th-edit').classList.remove('hidden');
+            document.getElementById('admin-th-delete').classList.remove('hidden');
+            document.getElementById('filter-unit').classList.remove('hidden');
+
+            await fetchUsersList();
+        } else {
+            entryTabBtn.classList.remove('hidden');
+            entryTab.classList.remove('hidden');
+            document.getElementById('entry-unit').value = currentUser.unit;
+            document.getElementById('tab-btn-entry').click();
+        }
+
+        if (currentUser.role === 'admin' || currentUser.role === 'superAdmin') {
+            let unitSelect = document.getElementById('filter-unit');
+            unitSelect.innerHTML = '<option value="">সব ইউনিট</option>';
+            let units = ["সদর থানা", "রুমা থানা", "রোয়াংছড়ি থানা", "নাইক্ষংছড়ি থানা", "আলীকদম থানা", "থানচি থানা", "লামা থানা", "ঘুমধুম তদন্ত কেন্দ্র", "বাইশারী তদন্ত কেন্দ্র", "টংকাবতি তদন্ত কেন্দ্র", "সদর ফাঁড়ি", "বাইশারী ফাঁড়ি", "কেয়াজুপাড়া ফাঁড়ি", "গজালিয়া ফাঁড়ি", "সোনাইছড়ি ফাঁড়ি", "ফাইতং ফাঁড়ি", "রাজবিল্লা ফাঁড়ি", "ডিবি", "ডিএসবি", "সদর কোর্ট", "লামা কোর্ট", "সদর ট্রাফিক", "লামা ট্রাফিক", "আলীকদম ট্রাফিক", "নাইক্ষ্যংছড়ি ট্রাফিক", "পুলিশ সুপারের কার্যালয়", "পুলিশ লাইন", "এমটি", "পুলিশ কন্ট্রোল রুম", "ডিপার্টমেন্টাল স্টোর", "অস্ত্রাগার", "রেশন স্টোর", "ব্যান্ড গ্রুপ", "রিজার্ভ অফিস", "সদর সার্কেল অফিস", "লামা সার্কেল অফিস", "রুমা সার্কেল অফিস", "আরআই অফিস", "মেজর অফিস", "চিম্বুক ক্যাম্প", "মেঘলা ক্যাম্প", "মিলনছড়ি ক্যাম্প", "হানসামপাড়া ক্যাম্প", "বেতছড়া ক্যাম্প", "তারাছামূখ ক্যাম্প", "তালুকদারপাড়া ক্যাম্প", "মুরংবাজার ক্যাম্প", "কৈক্ষ্যংঝিরি ক্যাম্প", "কুমারী ক্যাম্প", "আজিজনগর ক্যাম্প", "আলীক্ষ্যং ক্যাম্প", "২৬-কিলো ক্যাম্প", "রেইচা চেকপোষ্ট", "ডুলুপাড়া চেকপোষ্ট", "ইয়াংছা চেকপোষ্ট", "রুমা এসবি গার্ড", "রোয়াংছড়ি এসবি গার্ড", "বেতার বেইজ"];
+            units.forEach(u => { unitSelect.innerHTML += `<option value="${u}">${u}</option>`; });
+        }
+
+        await fetchDashboardData();
+    }
+
+    async function fetchDashboardData() {
+        showLoader();
+        let res = await fetch(`${SCRIPT_URL}?action=getData&userBp=${currentUser.bp}&userRole=${currentUser.role}&userUnit=${currentUser.unit}`);
+        let data = await res.json();
+        hideLoader();
+
+        if (data.status === "success") {
+            allSubmissions = data.submissions;
+            renderTable(allSubmissions);
+            if (currentUser.role === 'admin' || currentUser.role === 'superAdmin') {
+                renderRecycleTable(data.recycle);
+                renderAdminStats(allSubmissions);
+            }
+        }
+    }
+
+    async function fetchUsersList() {
+        let res = await fetch(`${SCRIPT_URL}?action=getUsers`);
+        let data = await res.json();
+        if (data.status === "success") {
+            allUsers = data.users;
+            let tbody = document.querySelector("#users-table tbody");
+            tbody.innerHTML = "";
+            document.getElementById('user-count').innerText = allUsers.length;
+            allUsers.forEach((u, i) => {
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${u.bp}</td><td>${u.rank}</td><td>${u.brashNumber || ''}</td><td>${u.name}</td><td>${u.unit}</td><td>${u.mobile}</td><td>${u.position}</td><td>${u.type}</td><td>${u.regDate}</td></tr>`;
+            });
+        }
+    }
+
+    async function fetchLogsList() {
+        let res = await fetch(`${SCRIPT_URL}?action=getLogs`);
+        let data = await res.json();
+        if (data.status === "success") {
+            allLogs = data.logs;
+            let tbody = document.querySelector("#logs-table tbody");
+            tbody.innerHTML = "";
+            allLogs.forEach((l, i) => {
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${l.bp}</td><td>${l.name}</td><td>${l.role}</td><td>${l.action}</td><td>${l.ip}</td><td>${l.browser}</td><td>${l.device}</td><td>${l.timezone}</td><td>${l.dateTime}</td></tr>`;
+            });
+        }
+    }
+
+    function renderTable(data) {
+        let tbody = document.querySelector("#dashboard-table tbody");
+        tbody.innerHTML = "";
+        document.getElementById('data-count').innerText = data.length;
+
+        data.forEach((item, index) => {
+            let editTd = '';
+            let deleteTd = '';
+
+            if (currentUser.role === 'admin' || currentUser.role === 'superAdmin') {
+                let editDisabled = item.isEdited === 'Yes' ? 'disabled' : '';
+                editTd = `<td><button class="btn" ${editDisabled} onclick='openEditModal(${JSON.stringify(item)})'>Edit</button></td>`;
+
+                if (currentUser.role === 'superAdmin') {
+                    let reqText = item.deleteRequest === 'Pending' ? 'Approval Req' : 'Delete';
+                    deleteTd = `<td><button class="btn btn-danger" onclick="approveDelete('${item.bp}')">${reqText}</button></td>`;
+                } else {
+                    let isPending = item.deleteRequest === 'Pending';
+                    let btnText = isPending ? 'Request Sent' : 'Delete';
+                    let btnDisabled = isPending ? 'disabled' : '';
+                    deleteTd = `<td><button class="btn btn-danger" ${btnDisabled} onclick="requestDelete('${item.bp}')">${btnText}</button></td>`;
+                }
+            }
+
+            tbody.innerHTML += `<tr>
+                <td>${index + 1}</td><td>${item.bp}</td><td>${item.rank}</td><td>${item.brashNumber}</td><td>${item.name}</td><td>${item.unit}</td><td>${item.mobile}</td><td>${item.position}</td><td>${item.remark}</td><td>${item.submittedId}</td><td>${item.submittedDateTime}</td>${editTd}${deleteTd}
+            </tr>`;
+        });
+    }
+
+    function openEditModal(item) {
+        document.getElementById('edit-bp-val').value = item.bp;
+        document.getElementById('edit-bp-display').value = item.bp;
+        document.getElementById('edit-rank').value = item.rank;
+        document.getElementById('edit-brash').value = item.brashNumber;
+        document.getElementById('edit-name').value = item.name;
+        document.getElementById('edit-mobile').value = item.mobile;
+        document.getElementById('edit-position').value = item.position;
+        document.getElementById('edit-remark').value = item.remark;
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    async function submitEditData(e) {
+        e.preventDefault();
+        let mobile = document.getElementById('edit-mobile').value.trim();
+        if (!validateMobile(mobile)) {
+            alert("মোবাইল নম্বর অবশ্যই ১১ ডিজিটের হতে হবে।");
+            return;
+        }
+
+        let payload = {
+            action: "editData",
+            bp: document.getElementById('edit-bp-val').value,
+            rank: document.getElementById('edit-rank').value,
+            brashNumber: document.getElementById('edit-brash').value,
+            name: document.getElementById('edit-name').value,
+            mobile: mobile,
+            position: document.getElementById('edit-position').value,
+            remark: document.getElementById('edit-remark').value
+        };
+
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        let result = await res.json();
+        hideLoader();
+        alert(result.message);
+        if(result.status === "success") {
+            closeEditModal();
+            fetchDashboardData();
+        }
+    }
+
+    async function requestDelete(bp) {
+        if(!confirm("আপনি কি এই ডাটা ডিলিট করার জন্য সুপার এডমিনের কাছে রিকোয়েস্ট পাঠাতে চান?")) return;
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({action: "requestDelete", bp: bp}) });
+        let result = await res.json();
+        hideLoader();
+        alert(result.message);
+        fetchDashboardData();
+    }
+
+    async function approveDelete(bp) {
+        if(!confirm("আপনি কি সুপার এডমিন হিসেবে এই ডাটা ডিলিট করে রিসাইকেলে পাঠাতে চান?")) return;
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({action: "approveDelete", bp: bp}) });
+        let result = await res.json();
+        hideLoader();
+        alert(result.message);
+        fetchDashboardData();
+    }
+
+    function renderRecycleTable(data) {
+        let tbody = document.querySelector("#recycle-table tbody");
+        tbody.innerHTML = "";
+        data.forEach((item, index) => {
+            tbody.innerHTML += `<tr><td>${index + 1}</td><td>${item.bp}</td><td>${item.rank}</td><td>${item.name}</td><td>${item.unit}</td><td>${item.submittedId}</td><td>${item.deletedDate}</td></tr>`;
+        });
+    }
+
+    function renderAdminStats(submissions) {
+        let stats = {};
+        submissions.forEach(item => {
+            let unit = item.unit;
+            let rank = item.rank;
+            if (!stats[unit]) stats[unit] = {};
+            if (!stats[unit][rank]) stats[unit][rank] = 0;
+            stats[unit][rank]++;
+        });
+
+        let tbody = document.querySelector("#admin-stats-table tbody");
+        tbody.innerHTML = "";
+        let ranks = ["কনস্টেবল", "নায়েক", "এএসআই (নিরস্ত্র)", "এএসআই (সশস্ত্র)", "এটিএসআই", "এসআই (নিরস্ত্র)", "এসআই (সশস্ত্র)", "টিএসআই"];
+        let sl = 1;
+        for (let unit in stats) {
+            let tr = `<tr><td>${sl++}</td><td>${unit}</td>`;
+            let totalUnit = 0;
+            ranks.forEach(r => {
+                let count = stats[unit][r] || 0;
+                totalUnit += count;
+                tr += `<td>${count}</td>`;
+            });
+            tr += `<td><b>${totalUnit}</b></td></tr>`;
+            tbody.innerHTML += tr;
+        }
+    }
+
+    async function handleDataSubmit(e) {
+        e.preventDefault();
+        let bp = document.getElementById('entry-bp').value.trim();
+        let mobile = document.getElementById('entry-mobile').value.trim();
+
+        if (!validateBP(bp)) {
+            alert("BP নম্বর অবশ্যই ১২ ডিজিটের হতে হবে এবং শুরুতে 'BP' থাকতে হবে।");
+            return;
+        }
+
+        if (!validateMobile(mobile)) {
+            alert("মোবাইল নম্বর অবশ্যই ১১ ডিজিটের হতে হবে।");
+            return;
+        }
+
+        let info = getDeviceInfo();
+        let payload = {
+            action: "submitData",
+            bp: bp,
+            rank: document.getElementById('entry-rank').value,
+            brashNumber: document.getElementById('entry-brash').value,
+            name: document.getElementById('entry-name').value,
+            unit: currentUser.unit,
+            mobile: mobile,
+            position: document.getElementById('entry-position').value,
+            remark: document.getElementById('entry-remark').value,
+            submittedId: currentUser.bp,
+            ip: "N/A",
+            browser: info.browser,
+            device: info.deviceType,
+            timezone: info.timezone
+        };
+
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        let result = await res.json();
+        hideLoader();
+        alert(result.message);
+        if(result.status === "success") fetchDashboardData();
+    }
+
+    async function logout() {
+        if(currentUser) {
+            let info = getDeviceInfo();
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "logout", bp: currentUser.bp, name: currentUser.name, role: currentUser.role, ip: "Web-Client", browser: info.browser, device: info.deviceType, timezone: info.timezone })
+            });
+        }
+        currentUser = null;
+        showSection('welcome-section');
+        loadPublicStats();
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tabs .tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.remove('hidden');
+        event.currentTarget.classList.add('active');
+    }
+
+    function filterDashboardData() {
+        let rank = document.getElementById('filter-rank').value;
+        let unit = document.getElementById('filter-unit') ? document.getElementById('filter-unit').value : '';
+        let filtered = allSubmissions.filter(item => {
+            let matchRank = !rank || item.rank === rank;
+            let matchUnit = !unit || item.unit === unit;
+            return matchRank && matchUnit;
+        });
+        renderTable(filtered);
+    }
+
+    function exportTableToExcel(tableID, filename = '') {
+        let downloadLink;
+        let dataType = 'application/vnd.ms-excel';
+        let tableSelect = document.getElementById(tableID);
+        let tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+        
+        filename = filename ?filename+'_excel_data.xls' : 'excel_data.xls';
+        downloadLink = document.createElement("a");
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+        downloadLink.download = filename;
+        downloadLink.click();
+    }
+</script>
 </body>
 </html>
