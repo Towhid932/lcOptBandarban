@@ -58,7 +58,7 @@
         <ul>
             <li>সঠিক BP নম্বর (১২ ডিজিট এবং শুরুতে 'BP') দিয়ে রেজিস্ট্রেশন করুন।</li>
             <li>মোবাইল নম্বর অবশ্যই ১১ ডিজিটের হতে হবে।</li>
-            <li>সব তথ্য নির্ভুলভাবে পূরণ করুন।</li>
+            <li>সুপার এডমিন প্যানেল থেকে ইউজার অ্যাকাউন্ট Active / Deactivated করা যাবে (সর্বোচ্চ ২ বার Active এবং ৩ বার Deactive হলে স্থায়ী Lock)।</li>
         </ul>
     </div>
 
@@ -199,7 +199,7 @@
         <div style="overflow-x: auto;">
             <table id="users-table">
                 <thead>
-                    <tr><th>SL</th><th>BP</th><th>Rank</th><th>Brash</th><th>Name</th><th>Unit</th><th>Mobile</th><th>Position</th><th>Type</th><th>Reg Date</th></tr>
+                    <tr><th>SL</th><th>BP</th><th>Rank</th><th>Brash</th><th>Name</th><th>Unit</th><th>Mobile</th><th>Position</th><th>Status</th><th>Reg Date</th><th id="super-admin-user-action" class="hidden">Action</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
@@ -282,7 +282,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJITdgP152e5db0htBjFzL9YjJ6btNDwUpVclTCpovEHSrIzG9hYLJ0FkuRYvCiAvM/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1HjFwOPYP9J7T6yN4_NA7x1sToqWazTS4ZZ1DkW0TdxLMFXcp_0PPDy-1IauCwMxn/exec";
     let currentUser = null;
     let allSubmissions = [];
     let allUsers = [];
@@ -319,7 +319,6 @@
         return { browser, deviceType, timezone };
     }
 
-    // Validation functions
     function validateBP(bp) {
         return bp.startsWith("BP") && bp.length === 12 && !/\s/.test(bp);
     }
@@ -385,7 +384,10 @@
         let result = await res.json();
         hideLoader();
         alert(result.message);
-        if (result.status === "success") showSection('auth-section');
+        if (result.status === "success") {
+            document.getElementById('reg-form').reset();
+            showSection('auth-section');
+        }
     }
 
     async function handleLogin(e) {
@@ -429,6 +431,7 @@
         document.getElementById('admin-th-edit').classList.add('hidden');
         document.getElementById('admin-th-delete').classList.add('hidden');
         document.getElementById('filter-unit').classList.add('hidden');
+        document.getElementById('super-admin-user-action').classList.add('hidden');
 
         if (currentUser.role === 'superAdmin') {
             entryTabBtn.classList.add('hidden');
@@ -442,6 +445,7 @@
             document.getElementById('admin-th-edit').classList.remove('hidden');
             document.getElementById('admin-th-delete').classList.remove('hidden');
             document.getElementById('filter-unit').classList.remove('hidden');
+            document.getElementById('super-admin-user-action').classList.remove('hidden');
             
             await fetchUsersList();
             await fetchLogsList();
@@ -500,8 +504,27 @@
             tbody.innerHTML = "";
             document.getElementById('user-count').innerText = allUsers.length;
             allUsers.forEach((u, i) => {
-                tbody.innerHTML += `<tr><td>${i+1}</td><td>${u.bp}</td><td>${u.rank}</td><td>${u.brashNumber || ''}</td><td>${u.name}</td><td>${u.unit}</td><td>${u.mobile}</td><td>${u.position}</td><td>${u.type}</td><td>${u.regDate}</td></tr>`;
+                let actionTd = '';
+                if (currentUser.role === 'superAdmin') {
+                    let btnText = u.status === 'Active' ? 'Deactivate' : (u.status === 'Locked' ? 'Locked' : 'Activate');
+                    let btnClass = u.status === 'Active' ? 'btn-danger' : 'btn-success';
+                    let isDisabled = u.status === 'Locked' ? 'disabled' : '';
+                    actionTd = `<td><button class="btn ${btnClass}" ${isDisabled} onclick="toggleUserStatus('${u.bp}')">${btnText} (${u.activeCount}/2)</button></td>`;
+                }
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${u.bp}</td><td>${u.rank}</td><td>${u.brashNumber || ''}</td><td>${u.name}</td><td>${u.unit}</td><td>${u.mobile}</td><td>${u.position}</td><td><b>${u.status}</b></td><td>${u.regDate}</td>${actionTd}</tr>`;
             });
+        }
+    }
+
+    async function toggleUserStatus(bp) {
+        if(!confirm("আপনি কি এই ইউজারের স্ট্যাটাস পরিবর্তন করতে চান?")) return;
+        showLoader();
+        let res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({action: "toggleUserStatus", bp: bp}) });
+        let result = await res.json();
+        hideLoader();
+        alert(result.message);
+        if(result.status === "success") {
+            fetchUsersList();
         }
     }
 
@@ -687,7 +710,14 @@
         let result = await res.json();
         hideLoader();
         alert(result.message);
-        if(result.status === "success") fetchDashboardData();
+        
+        if(result.status === "success") {
+            // ফর্ম সাবমিট সফল হলে পুরো ফরমটি স্বয়ংক্রিয়ভাবে রিসেট হয়ে যাবে
+            document.getElementById('entry-form').reset();
+            // অটো-ফিল ইউনিট ফিল্ডটি পুনরায় সেট করে দেওয়া হচ্ছে যাতে মুছে না যায়
+            document.getElementById('entry-unit').value = currentUser.unit;
+            fetchDashboardData();
+        }
     }
 
     async function logout() {
